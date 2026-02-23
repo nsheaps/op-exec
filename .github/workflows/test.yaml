@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check bash syntax
+        run: |
+          for script in bin/*; do
+            [[ -d "$script" ]] && continue
+            echo "Checking $script..."
+            bash -n "$script"
+          done
+          echo "All scripts passed syntax check."

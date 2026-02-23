@@ -1,0 +1,16 @@
+[tools]
+node = "lts"
+yarn = "4"
+
+[tasks.lint]
+description = "Check bash syntax for all scripts"
+run = """
+for script in bin/*; do
+  [[ -d "$script" ]] && continue
+  if head -1 "$script" | grep -q 'bash'; then
+    echo "Checking $script..."
+    bash -n "$script"
+  fi
+done
+echo "All scripts passed syntax check."
+"""
