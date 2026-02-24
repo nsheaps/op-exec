@@ -14,3 +14,16 @@ for script in bin/*; do
 done
 echo "All scripts passed syntax check."
 """
+
+[tasks.test]
+description = "Run CLI tests"
+run = """
+echo "Testing op-exec --help..."
+bash bin/op-exec --help > /dev/null
+echo "All tests passed."
+"""
+
+[tasks.check]
+description = "Run all checks (lint + test)"
+depends = ["lint", "test"]
+run = "echo 'All checks passed'"
