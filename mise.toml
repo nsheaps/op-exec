@@ -3,17 +3,8 @@ node = "lts"
 yarn = "4"
 
 [tasks.lint]
-description = "Check bash syntax for all scripts"
-run = """
-for script in bin/*; do
-  [[ -d "$script" ]] && continue
-  if head -1 "$script" | grep -q 'bash'; then
-    echo "Checking $script..."
-    bash -n "$script"
-  fi
-done
-echo "All scripts passed syntax check."
-"""
+description = "Run ShellCheck on all bash scripts"
+run = "shellcheck bin/op-exec"
 
 [tasks.test]
 description = "Run CLI tests"
@@ -23,7 +14,15 @@ bash bin/op-exec --help > /dev/null
 echo "All tests passed."
 """
 
+[tasks.fmt]
+description = "Format all bash scripts with shfmt"
+run = "shfmt -w bin/op-exec"
+
+[tasks.fmt-check]
+description = "Check formatting of all bash scripts"
+run = "shfmt -d bin/op-exec"
+
 [tasks.check]
-description = "Run all checks (lint + test)"
-depends = ["lint", "test"]
+description = "Run all checks (lint + fmt-check + test)"
+depends = ["lint", "fmt-check", "test"]
 run = "echo 'All checks passed'"

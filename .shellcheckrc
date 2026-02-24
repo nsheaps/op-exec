@@ -1,0 +1,8 @@
+# ShellCheck configuration for nsheaps/op-exec
+# https://www.shellcheck.net/wiki/
+
+# Default shell dialect — all scripts in this repo are bash.
+shell=bash
+
+# SC1091: Not following sourced files — sourced paths are dynamic
+disable=SC1091

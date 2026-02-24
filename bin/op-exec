@@ -118,7 +118,7 @@ fetch_fields() {
 
   # Get item as JSON and extract fields
   # Filter to STRING and CONCEALED types, output as label<TAB>value
-  op item get "$item" --vault "$vault" --format json 2>/dev/null | \
+  op item get "$item" --vault "$vault" --format json 2>/dev/null |
     jq -r '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | "\(.label)\t\(.value // "")"'
 }
 
@@ -154,25 +154,25 @@ main() {
   # Parse flags
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -h|--help)
-        show_help
-        exit 0
-        ;;
-      -d|--debug)
-        DEBUG=1
-        shift
-        ;;
-      --)
-        shift
-        break
-        ;;
-      op://*)
-        # Found the reference, stop parsing flags
-        break
-        ;;
-      *)
-        fatal "Unknown option: $1"
-        ;;
+    -h | --help)
+      show_help
+      exit 0
+      ;;
+    -d | --debug)
+      DEBUG=1
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    op://*)
+      # Found the reference, stop parsing flags
+      break
+      ;;
+    *)
+      fatal "Unknown option: $1"
+      ;;
     esac
   done
 
@@ -200,7 +200,7 @@ main() {
   fi
 
   # Parse reference
-  read -r vault item <<< "$(parse_ref "$ref")"
+  read -r vault item <<<"$(parse_ref "$ref")"
   debug "Parsed: vault=$vault item=$item"
 
   # Fetch and process fields
