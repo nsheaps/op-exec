@@ -15,20 +15,19 @@ jobs:
     outputs:
       version: ${{ steps.release.outputs.version }}
       tag: ${{ steps.release.outputs.tag }}
+      released: ${{ steps.release.outputs.released }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Authenticate as GitHub App
-        id: auth
-        uses: ./.github/actions/github-app-auth
-        with:
-          app-id: ${{ secrets.AUTOMATION_GITHUB_APP_ID }}
-          private-key: ${{ secrets.AUTOMATION_GITHUB_APP_PRIVATE_KEY }}
-
       - name: Fetch tags
         run: git fetch --tags --force
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Setup mise
         uses: jdx/mise-action@v2
@@ -39,16 +38,24 @@ jobs:
       - name: Run release-it
         id: release
         env:
-          GITHUB_TOKEN: ${{ steps.auth.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          BEFORE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           yarn release-it --ci
-          TAG=$(git describe --tags --abbrev=0)
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          AFTER_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ "$BEFORE_TAG" != "$AFTER_TAG" ] && [ -n "$AFTER_TAG" ]; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+            echo "tag=$AFTER_TAG" >> "$GITHUB_OUTPUT"
+            echo "version=${AFTER_TAG#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            echo "No new release created"
+          fi
 
       - name: Upload release assets
+        if: steps.release.outputs.released == 'true'
         env:
-          GITHUB_TOKEN: ${{ steps.auth.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ steps.release.outputs.tag }}"
           # op-exec is a platform-independent bash script, but ubi (used by
@@ -63,6 +70,7 @@ jobs:
 
   update-homebrew:
     needs: release
+    if: needs.release.outputs.released == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
