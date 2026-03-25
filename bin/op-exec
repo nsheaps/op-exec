@@ -63,7 +63,7 @@ is_op_ref() {
 resolve_ref() {
   local ref="$1"
   debug "Resolving: $ref"
-  op read "$ref"
+  op read "$ref" || true
 }
 
 # -----------------------------------------------------------------------------
