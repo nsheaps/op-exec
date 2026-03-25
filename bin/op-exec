@@ -227,8 +227,11 @@ main() {
   # If no command provided, just print exports
   if [[ $# -eq 0 ]]; then
     for name in "${!env_vars[@]}"; do
-      # Escape value for shell
-      printf 'export %s=%q\n' "$name" "${env_vars[$name]}"
+      # Use heredoc wrapper for readability, especially for multiline values (e.g. PEM keys)
+      echo "export ${name}=\$(cat <<'__OPEXEC_EOF__'"
+      echo "${env_vars[$name]}"
+      echo "__OPEXEC_EOF__"
+      echo ")"
     done
     exit 0
   fi
