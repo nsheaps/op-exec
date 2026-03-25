@@ -119,10 +119,10 @@ fetch_fields() {
   debug "Fetching: vault=$vault item=$item"
 
   # Get item as JSON and extract fields
-  # Filter to STRING and CONCEALED types, output as label<TAB>value<NUL>
-  # Using null byte as record separator so multiline values (e.g. PEM keys) are handled correctly
+  # Filter to STRING and CONCEALED types, output one compact JSON object per line.
+  # Using jq -c avoids jq -r converting escaped \n sequences to real newlines.
   op item get "$item" --vault "$vault" --format json 2>/dev/null |
-    jq -r '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | "\(.label)\t\(.value // "")\u0000"'
+    jq -c '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | {label: .label, value: (.value // "")}'
 }
 
 # -----------------------------------------------------------------------------
@@ -209,10 +209,13 @@ main() {
   # Fetch and process fields
   declare -A env_vars
 
-  while IFS=$'\t' read -r -d '' label value; do
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    local label value env_name
+    label=$(echo "$line" | jq -r '.label')
+    value=$(echo "$line" | jq -r '.value')
     [[ -z "$label" ]] && continue
 
-    local env_name
     env_name=$(to_env_name "$label")
 
     debug "Processing: $label -> $env_name"
