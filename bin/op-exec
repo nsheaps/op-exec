@@ -63,7 +63,7 @@ is_op_ref() {
 resolve_ref() {
   local ref="$1"
   debug "Resolving: $ref"
-  op read "$ref" 2>/dev/null || echo ""
+  op read "$ref"
 }
 
 # -----------------------------------------------------------------------------
@@ -121,7 +121,7 @@ fetch_fields() {
   # Get item as JSON and extract fields
   # Filter to STRING and CONCEALED types, output one compact JSON object per line.
   # Using jq -c avoids jq -r converting escaped \n sequences to real newlines.
-  op item get "$item" --vault "$vault" --format json 2>/dev/null |
+  op item get "$item" --vault "$vault" --format json |
     jq -c '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | {label: .label, value: (.value // "")}'
 }
 
