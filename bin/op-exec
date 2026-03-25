@@ -63,7 +63,7 @@ is_op_ref() {
 resolve_ref() {
   local ref="$1"
   debug "Resolving: $ref"
-  op read "$ref" 2>/dev/null || echo ""
+  op read "$ref" || true
 }
 
 # -----------------------------------------------------------------------------
@@ -119,9 +119,10 @@ fetch_fields() {
   debug "Fetching: vault=$vault item=$item"
 
   # Get item as JSON and extract fields
-  # Filter to STRING and CONCEALED types, output as label<TAB>value
-  op item get "$item" --vault "$vault" --format json 2>/dev/null |
-    jq -r '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | "\(.label)\t\(.value // "")"'
+  # Filter to STRING and CONCEALED types, output one compact JSON object per line.
+  # Using jq -c avoids jq -r converting escaped \n sequences to real newlines.
+  op item get "$item" --vault "$vault" --format json |
+    jq -c '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | {label: .label, value: (.value // "")}'
 }
 
 # -----------------------------------------------------------------------------
@@ -208,10 +209,13 @@ main() {
   # Fetch and process fields
   declare -A env_vars
 
-  while IFS=$'\t' read -r label value; do
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    local label value env_name
+    label=$(echo "$line" | jq -r '.label')
+    value=$(echo "$line" | jq -r '.value')
     [[ -z "$label" ]] && continue
 
-    local env_name
     env_name=$(to_env_name "$label")
 
     debug "Processing: $label -> $env_name"
@@ -226,8 +230,11 @@ main() {
   # If no command provided, just print exports
   if [[ $# -eq 0 ]]; then
     for name in "${!env_vars[@]}"; do
-      # Escape value for shell
-      printf 'export %s=%q\n' "$name" "${env_vars[$name]}"
+      # Use heredoc wrapper for readability, especially for multiline values (e.g. PEM keys)
+      echo "export ${name}=\$(cat <<'__OPEXEC_EOF__'"
+      echo "${env_vars[$name]}"
+      echo "__OPEXEC_EOF__"
+      echo ")"
     done
     exit 0
   fi
