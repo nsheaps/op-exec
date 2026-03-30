@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.3](https://github.com/nsheaps/op-exec/compare/v0.0.2...v0.0.3) (2026-03-30)
+
+### Bug Fixes
+
+* use op whoami instead of op account list for auth check ([#9](https://github.com/nsheaps/op-exec/issues/9)) ([98cce08](https://github.com/nsheaps/op-exec/commit/98cce0874d489985b4f9d7b4c96dcb41726655b5))
+
 ## [0.0.2](https://github.com/nsheaps/op-exec/compare/v0.0.1...v0.0.2) (2026-03-25)
 
 ### Bug Fixes
