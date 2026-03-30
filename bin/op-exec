@@ -197,9 +197,10 @@ main() {
   command -v op >/dev/null 2>&1 || fatal "1Password CLI (op) not found"
   command -v jq >/dev/null 2>&1 || fatal "jq not found"
 
-  # Check if signed in
-  if ! op account list >/dev/null 2>&1; then
-    fatal "Not signed in to 1Password. Run 'op signin' first."
+  # Check if signed in (use whoami, not account list — account list
+  # doesn't work with service account tokens)
+  if ! op whoami >/dev/null 2>&1; then
+    fatal "Not signed in to 1Password. Run 'op signin' first, or set OP_SERVICE_ACCOUNT_TOKEN."
   fi
 
   # Parse reference
