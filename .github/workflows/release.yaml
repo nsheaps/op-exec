@@ -46,6 +46,21 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
 
+      - name: Upload release assets
+        env:
+          GITHUB_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          TAG="${{ steps.release.outputs.tag }}"
+          # op-exec is a platform-independent bash script, but ubi (used by
+          # mise) expects assets named with OS/arch patterns. Upload copies
+          # for each supported platform so `mise install ubi:nsheaps/op-exec`
+          # works out of the box.
+          for platform in linux-amd64 linux-arm64 darwin-amd64 darwin-arm64; do
+            cp bin/op-exec "op-exec-${platform}"
+          done
+          gh release upload "$TAG" op-exec-linux-amd64 op-exec-linux-arm64 op-exec-darwin-amd64 op-exec-darwin-arm64
+          rm -f op-exec-linux-amd64 op-exec-linux-arm64 op-exec-darwin-amd64 op-exec-darwin-arm64
+
   update-homebrew:
     needs: release
     runs-on: ubuntu-latest

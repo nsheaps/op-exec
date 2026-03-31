@@ -1,6 +1,8 @@
 [tools]
 node = "lts"
 yarn = "4"
+shellcheck = "latest"
+shfmt = "latest"
 
 [tasks.lint]
 description = "Run ShellCheck on all bash scripts"
