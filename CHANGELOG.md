@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.4](https://github.com/nsheaps/op-exec/compare/v0.0.3...v0.0.4) (2026-03-31)
+
+### Maintenance
+
+* Configure Renovate ([#3](https://github.com/nsheaps/op-exec/issues/3)) ([a2d9c59](https://github.com/nsheaps/op-exec/commit/a2d9c592996198248bc1e52a4d00c5f87d6fbd31))
+
 ## [0.0.3](https://github.com/nsheaps/op-exec/compare/v0.0.2...v0.0.3) (2026-03-30)
 
 ### Bug Fixes
