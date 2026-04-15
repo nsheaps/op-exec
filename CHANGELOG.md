@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.5](https://github.com/nsheaps/op-exec/compare/v0.0.4...v0.0.5) (2026-04-15)
+
+### Maintenance
+
+* **deps:** update actions/checkout action to v6 ([#11](https://github.com/nsheaps/op-exec/issues/11)) ([db338b4](https://github.com/nsheaps/op-exec/commit/db338b48f1728340736c2848d231bb5a1f867b04))
+
 ## [0.0.4](https://github.com/nsheaps/op-exec/compare/v0.0.3...v0.0.4) (2026-03-31)
 
 ### Maintenance
