@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.7](https://github.com/nsheaps/op-exec/compare/v0.0.6...v0.0.7) (2026-04-16)
+
+### Maintenance
+
+* **deps:** update dependency @release-it/conventional-changelog to ^10.0.6 ([#15](https://github.com/nsheaps/op-exec/issues/15)) ([56cb271](https://github.com/nsheaps/op-exec/commit/56cb2717dbc8bbe20a88311e2dcd989fc37378d1))
+
 ## [0.0.6](https://github.com/nsheaps/op-exec/compare/v0.0.5...v0.0.6) (2026-04-16)
 
 ### Maintenance
