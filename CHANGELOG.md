@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.8](https://github.com/nsheaps/op-exec/compare/v0.0.7...v0.0.8) (2026-04-26)
+
+### Maintenance
+
+* update Yarn to 4.14.1 (lockfile v9) ([0dce3fa](https://github.com/nsheaps/op-exec/commit/0dce3fad47cb50f774d858022f0848c496170a8a))
+
 ## [0.0.7](https://github.com/nsheaps/op-exec/compare/v0.0.6...v0.0.7) (2026-04-16)
 
 ### Maintenance
