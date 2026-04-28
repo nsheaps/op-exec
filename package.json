@@ -10,7 +10,7 @@
   "license": "MIT",
   "devDependencies": {
     "@release-it/conventional-changelog": "^10.0.6",
-    "conventional-changelog-conventionalcommits": "^9.3.0",
+    "conventional-changelog-conventionalcommits": "^9.3.1",
     "conventional-commits-filter": "^5.0.0",
     "conventional-commits-parser": "^6.3.0",
     "release-it": "^19.2.4"
