@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.9](https://github.com/nsheaps/op-exec/compare/v0.0.8...v0.0.9) (2026-04-29)
+
+### Maintenance
+
+* **deps:** update dependency conventional-changelog-conventionalcommits to ^9.3.1 ([#20](https://github.com/nsheaps/op-exec/issues/20)) ([e587ea0](https://github.com/nsheaps/op-exec/commit/e587ea019c3f9790688612b85bb1202958a76f58))
+
 ## [0.0.8](https://github.com/nsheaps/op-exec/compare/v0.0.7...v0.0.8) (2026-04-26)
 
 ### Maintenance
