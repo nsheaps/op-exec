@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.10](https://github.com/nsheaps/op-exec/compare/v0.0.9...v0.0.10) (2026-04-30)
+
+### Maintenance
+
+* **deps:** update dependency conventional-commits-parser to ^6.4.0 ([#21](https://github.com/nsheaps/op-exec/issues/21)) ([19c13a6](https://github.com/nsheaps/op-exec/commit/19c13a6f394ddaeb5373bad97a95eb3aa9be65df))
+
 ## [0.0.9](https://github.com/nsheaps/op-exec/compare/v0.0.8...v0.0.9) (2026-04-29)
 
 ### Maintenance
