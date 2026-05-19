@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.13](https://github.com/nsheaps/op-exec/compare/v0.0.12...v0.0.13) (2026-05-19)
+
+### Bug Fixes
+
+* **resolve_value_to:** rename inner `local resolved` to avoid shadowing caller's same-named local ([#24](https://github.com/nsheaps/op-exec/issues/24)) ([6d59478](https://github.com/nsheaps/op-exec/commit/6d594780c50c0075d306c854ae872df27442265a))
+
 ## [0.0.12](https://github.com/nsheaps/op-exec/compare/v0.0.11...v0.0.12) (2026-05-19)
 
 ## [0.0.11](https://github.com/nsheaps/op-exec/compare/v0.0.10...v0.0.11) (2026-05-15)
