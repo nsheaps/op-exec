@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.0.12](https://github.com/nsheaps/op-exec/compare/v0.0.11...v0.0.12) (2026-05-19)
+
 ## [0.0.11](https://github.com/nsheaps/op-exec/compare/v0.0.10...v0.0.11) (2026-05-15)
 
 ### Maintenance
