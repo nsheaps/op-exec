@@ -347,7 +347,7 @@ main() {
   # Written before exec so the file is populated even if the child process exits non-zero.
   if [[ -n "$CONCEALED_FILE" ]]; then
     for name in "${!env_concealed[@]}"; do
-      printf '%s\n' "$name" >> "$CONCEALED_FILE"
+      printf '%s\n' "$name" >>"$CONCEALED_FILE"
     done
     debug "Wrote ${#env_concealed[@]} concealed var name(s) to $CONCEALED_FILE"
   fi
