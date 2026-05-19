@@ -6,8 +6,8 @@
 # Field values can be raw values or op:// references that get recursively resolved.
 #
 # Usage:
-#   op-exec op://vault/item -- command [args...]
-#   op-exec op://vault/item  # just print exports (for debugging)
+#   op-exec [options] op://vault/item -- command [args...]
+#   op-exec [options] op://vault/item  # just print exports (for debugging)
 #
 # Examples:
 #   op-exec op://Development/my-app-config -- npm start
@@ -30,6 +30,15 @@ set -euo pipefail
 # -----------------------------------------------------------------------------
 MAX_DEPTH=5
 DEBUG=${DEBUG:-}
+
+# Global flag: set to "1" by resolve_value_to if any resolution hop is CONCEALED.
+# Must be reset to "" before each top-level resolve_value_to call.
+_RESOLVE_CONCEALED=""
+
+# Cache for op item get JSON responses: key = "vault/item", value = JSON string.
+# Avoids repeated API calls when get_ref_type is called multiple times for the
+# same item (e.g. multiple fields in one item reference another item).
+declare -A _OP_ITEM_TYPE_CACHE
 
 # -----------------------------------------------------------------------------
 # Helpers
@@ -67,32 +76,115 @@ resolve_ref() {
 }
 
 # -----------------------------------------------------------------------------
+# Type resolution
+# -----------------------------------------------------------------------------
+
+# get_ref_type OP_FIELD_REF
+#
+# Prints the field type (e.g. CONCEALED, STRING) for an op://vault/item/field
+# reference. Returns empty string for 2-segment op://vault/item refs — those
+# refer to an entire item rather than a single field, so a single type cannot
+# be determined without inspecting all fields.
+#
+# Uses _OP_ITEM_TYPE_CACHE (keyed by "vault/item") to avoid redundant API calls
+# when multiple fields in the same item are inspected.
+get_ref_type() {
+  local ref="$1"
+  # Strip op:// prefix and split into segments
+  local path="${ref#op://}"
+  local vault item remainder field
+
+  vault="${path%%/*}"
+  remainder="${path#*/}"
+  item="${remainder%%/*}"
+  field="${remainder#*/}"
+
+  # If field == item remainder after stripping item, there was no third segment
+  if [[ "$field" == "$item" ]]; then
+    # 2-segment op://vault/item reference: cannot determine a single field type.
+    # Whether such a cross-item reference is CONCEALED cannot be inferred without
+    # inspecting every field in the referenced item. Callers should treat 2-segment
+    # refs conservatively (i.e. assume non-CONCEALED unless the top-level field says so).
+    debug "get_ref_type: no field segment in $ref — cannot determine type"
+    return
+  fi
+
+  local cache_key="${vault}/${item}"
+  local item_json
+
+  if [[ -n "${_OP_ITEM_TYPE_CACHE[$cache_key]:-}" ]]; then
+    item_json="${_OP_ITEM_TYPE_CACHE[$cache_key]}"
+    debug "get_ref_type: cache hit for $cache_key"
+  else
+    debug "get_ref_type: fetching $cache_key"
+    item_json=$(op item get "$item" --vault "$vault" --format json 2>/dev/null || true)
+    _OP_ITEM_TYPE_CACHE["$cache_key"]="$item_json"
+  fi
+
+  if [[ -z "$item_json" ]]; then
+    debug "get_ref_type: empty response for $cache_key"
+    return
+  fi
+
+  printf '%s' "$item_json" | jq -r --arg f "$field" \
+    '.fields[]? | select(.label == $f) | .type' 2>/dev/null | head -1
+}
+
+# -----------------------------------------------------------------------------
 # Main Logic
 # -----------------------------------------------------------------------------
 
-# Recursively resolve a value until it's not an op:// ref (or max depth)
-resolve_value() {
-  local value="$1"
-  local depth="${2:-0}"
+# resolve_value_to OUT_VAR VALUE [DEPTH]
+#
+# Recursively resolves VALUE until it is no longer an op:// reference (or
+# MAX_DEPTH is reached), writing the final value into the variable named by
+# OUT_VAR via printf -v (no subshell, so _RESOLVE_CONCEALED assignments
+# are visible to the caller).
+#
+# Sets _RESOLVE_CONCEALED=1 if any resolution hop targets a CONCEALED field.
+# Callers MUST reset _RESOLVE_CONCEALED="" before calling this function if
+# they want a clean per-variable concealed flag.
+resolve_value_to() {
+  local _out_var="$1"
+  local value="$2"
+  local depth="${3:-0}"
 
   if [[ $depth -ge $MAX_DEPTH ]]; then
     debug "Max depth reached for value"
-    echo "$value"
+    printf -v "$_out_var" '%s' "$value"
     return
   fi
 
   if is_op_ref "$value"; then
+    local ref_type
+    ref_type=$(get_ref_type "$value")
+    if [[ "$ref_type" == "CONCEALED" ]]; then
+      _RESOLVE_CONCEALED=1
+      debug "resolve_value_to: hop is CONCEALED ($value)"
+    fi
     local resolved
     resolved=$(resolve_ref "$value")
     if [[ -n "$resolved" ]]; then
-      resolve_value "$resolved" $((depth + 1))
+      resolve_value_to "$_out_var" "$resolved" $((depth + 1))
     else
       debug "Failed to resolve: $value"
-      echo "$value"
+      printf -v "$_out_var" '%s' "$value"
     fi
   else
-    echo "$value"
+    printf -v "$_out_var" '%s' "$value"
   fi
+}
+
+# resolve_value VALUE [DEPTH]
+#
+# Legacy wrapper used by callers that need the resolved value on stdout
+# (e.g. the "print exports" no-command path). Does NOT track CONCEALED state.
+resolve_value() {
+  local value="$1"
+  local depth="${2:-0}"
+  local _rv_result
+  resolve_value_to _rv_result "$value" "$depth"
+  echo "$_rv_result"
 }
 
 # Parse op://vault/item reference
@@ -121,8 +213,9 @@ fetch_fields() {
   # Get item as JSON and extract fields
   # Filter to STRING and CONCEALED types, output one compact JSON object per line.
   # Using jq -c avoids jq -r converting escaped \n sequences to real newlines.
+  # Include .type so the caller can distinguish CONCEALED from STRING fields.
   op item get "$item" --vault "$vault" --format json |
-    jq -c '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | {label: .label, value: (.value // "")}'
+    jq -c '.fields[]? | select(.type == "STRING" or .type == "CONCEALED") | {label: .label, value: (.value // ""), type: .type}'
 }
 
 # -----------------------------------------------------------------------------
@@ -134,12 +227,13 @@ show_help() {
 op-exec - Execute a command with 1Password secrets as environment variables
 
 Usage:
-  op-exec op://vault/item -- command [args...]
-  op-exec op://vault/item  # print exports (for debugging/sourcing)
+  op-exec [options] op://vault/item -- command [args...]
+  op-exec [options] op://vault/item  # print exports (for debugging/sourcing)
 
 Options:
-  -h, --help    Show this help
-  -d, --debug   Enable debug output
+  -h, --help              Show this help
+  -d, --debug             Enable debug output
+  --concealed-file FILE   Append CONCEALED var names (one per line) to FILE
 
 Examples:
   op-exec op://Development/my-app-config -- npm start
@@ -148,12 +242,17 @@ Examples:
   # Source into current shell
   eval "$(op-exec op://vault/item)"
 
+  # Track which vars are secrets for downstream redaction
+  op-exec --concealed-file /tmp/.env.secrets op://vault/item -- npm start
+
 Environment:
   DEBUG=1       Enable debug output
 EOF
 }
 
 main() {
+  local CONCEALED_FILE=""
+
   # Parse flags
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -164,6 +263,11 @@ main() {
     -d | --debug)
       DEBUG=1
       shift
+      ;;
+    --concealed-file)
+      [[ $# -lt 2 ]] && fatal "--concealed-file requires a FILE argument"
+      CONCEALED_FILE="$2"
+      shift 2
       ;;
     --)
       shift
@@ -209,24 +313,44 @@ main() {
 
   # Fetch and process fields
   declare -A env_vars
+  declare -A env_concealed
 
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
-    local label value env_name
+    local label value type env_name
     label=$(echo "$line" | jq -r '.label')
     value=$(echo "$line" | jq -r '.value')
+    type=$(echo "$line" | jq -r '.type')
     [[ -z "$label" ]] && continue
 
     env_name=$(to_env_name "$label")
 
-    debug "Processing: $label -> $env_name"
+    debug "Processing: $label -> $env_name (type=$type)"
 
-    # Recursively resolve if it's a reference
+    # Reset the concealed-chain flag before each field so each variable gets
+    # an independent concealed determination.
+    _RESOLVE_CONCEALED=""
     local resolved
-    resolved=$(resolve_value "$value")
+    resolve_value_to resolved "$value"
 
     env_vars["$env_name"]="$resolved"
+
+    # Mark as concealed if the top-level field is CONCEALED, or if any
+    # hop in the op:// resolution chain was CONCEALED.
+    if [[ "$type" == "CONCEALED" || -n "$_RESOLVE_CONCEALED" ]]; then
+      env_concealed["$env_name"]=1
+      debug "Marking $env_name as concealed"
+    fi
   done < <(fetch_fields "$vault" "$item")
+
+  # Write concealed var names to --concealed-file if requested.
+  # Written before exec so the file is populated even if the child process exits non-zero.
+  if [[ -n "$CONCEALED_FILE" ]]; then
+    for name in "${!env_concealed[@]}"; do
+      printf '%s\n' "$name" >> "$CONCEALED_FILE"
+    done
+    debug "Wrote ${#env_concealed[@]} concealed var name(s) to $CONCEALED_FILE"
+  fi
 
   # If no command provided, just print exports
   if [[ $# -eq 0 ]]; then
