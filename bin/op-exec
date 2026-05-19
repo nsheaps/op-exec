@@ -162,10 +162,16 @@ resolve_value_to() {
       _RESOLVE_CONCEALED=1
       debug "resolve_value_to: hop is CONCEALED ($value)"
     fi
-    local resolved
-    resolved=$(resolve_ref "$value")
-    if [[ -n "$resolved" ]]; then
-      resolve_value_to "$_out_var" "$resolved" $((depth + 1))
+    # NOTE: name MUST NOT be "resolved" — callers (e.g. the main field-iteration
+    # loop) use `local resolved; resolve_value_to resolved "$value"` and bash
+    # dynamic scoping makes a local of the same name here shadow the caller's,
+    # so `printf -v "$_out_var"` would target THIS local (destroyed on return)
+    # instead of the caller's, leaving caller's resolved=stale from the previous
+    # iteration. Distinct name (_rv_resolved) avoids the shadow.
+    local _rv_resolved
+    _rv_resolved=$(resolve_ref "$value")
+    if [[ -n "$_rv_resolved" ]]; then
+      resolve_value_to "$_out_var" "$_rv_resolved" $((depth + 1))
     else
       debug "Failed to resolve: $value"
       printf -v "$_out_var" '%s' "$value"
