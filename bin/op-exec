@@ -237,9 +237,15 @@ Usage:
   op-exec [options] op://vault/item  # print exports (for debugging/sourcing)
 
 Options:
-  -h, --help              Show this help
-  -d, --debug             Enable debug output
-  --concealed-file FILE   Append CONCEALED var names (one per line) to FILE
+  -h, --help                 Show this help
+  -d, --debug                Enable debug output
+  --concealed-file FILE      Append CONCEALED var names (one per line) to FILE
+  --concealed-kv-file FILE
+                          Write CONCEALED NAME=value pairs (one per line) to
+                          FILE. File is chmod 600 since it carries secret
+                          values. Multi-line values (e.g. PEM keys) are
+                          skipped — only single-line values are emitted.
+                          Existing FILE is truncated before write.
 
 Examples:
   op-exec op://Development/my-app-config -- npm start
@@ -248,8 +254,11 @@ Examples:
   # Source into current shell
   eval "$(op-exec op://vault/item)"
 
-  # Track which vars are secrets for downstream redaction
+  # Track which vars are secrets for downstream redaction (names only)
   op-exec --concealed-file /tmp/.env.secrets op://vault/item -- npm start
+
+  # Materialize NAME=value pairs for downstream redaction without env lookup
+  op-exec --concealed-kv-file /tmp/.env.secrets.values op://vault/item -- npm start
 
 Environment:
   DEBUG=1       Enable debug output
@@ -258,6 +267,7 @@ EOF
 
 main() {
   local CONCEALED_FILE=""
+  local CONCEALED_KV_FILE=""
 
   # Parse flags
   while [[ $# -gt 0 ]]; do
@@ -273,6 +283,11 @@ main() {
     --concealed-file)
       [[ $# -lt 2 ]] && fatal "--concealed-file requires a FILE argument"
       CONCEALED_FILE="$2"
+      shift 2
+      ;;
+    --concealed-kv-file)
+      [[ $# -lt 2 ]] && fatal "--concealed-kv-file requires a FILE argument"
+      CONCEALED_KV_FILE="$2"
       shift 2
       ;;
     --)
@@ -356,6 +371,29 @@ main() {
       printf '%s\n' "$name" >>"$CONCEALED_FILE"
     done
     debug "Wrote ${#env_concealed[@]} concealed var name(s) to $CONCEALED_FILE"
+  fi
+
+  # Write NAME=value pairs to --concealed-kv-file if requested.
+  # File is truncated (not appended) and chmod'd 0600 — it carries secret values.
+  # Multi-line values are skipped: the file format is one entry per line, so
+  # values containing newlines would break parsing. Consumers (the 1pass plugin
+  # redact-secrets hook) currently skip multi-line values anyway, so this is
+  # the same constraint as the existing --concealed-file pathway.
+  if [[ -n "$CONCEALED_KV_FILE" ]]; then
+    : >"$CONCEALED_KV_FILE"
+    chmod 0600 "$CONCEALED_KV_FILE"
+    local kv_written=0 kv_skipped=0
+    for name in "${!env_concealed[@]}"; do
+      local val="${env_vars[$name]}"
+      if [[ "$val" == *$'\n'* ]]; then
+        debug "Skipping multi-line concealed value: $name"
+        kv_skipped=$((kv_skipped + 1))
+        continue
+      fi
+      printf '%s=%s\n' "$name" "$val" >>"$CONCEALED_KV_FILE"
+      kv_written=$((kv_written + 1))
+    done
+    debug "Wrote ${kv_written} NAME=value pair(s) (skipped ${kv_skipped} multi-line) to $CONCEALED_KV_FILE"
   fi
 
   # If no command provided, just print exports
