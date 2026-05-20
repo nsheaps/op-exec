@@ -240,11 +240,12 @@ Options:
   -h, --help                 Show this help
   -d, --debug                Enable debug output
   --concealed-file FILE      Append CONCEALED var names (one per line) to FILE
-  --concealed-kv-file FILE   Write CONCEALED NAME=value pairs (one per line) to
-                             FILE. File is chmod 600 since it carries secret
-                             values. Multi-line values (e.g. PEM keys) are
-                             skipped — only single-line values are emitted.
-                             Existing FILE is truncated before write.
+  --concealed-kv-file FILE
+                          Write CONCEALED NAME=value pairs (one per line) to
+                          FILE. File is chmod 600 since it carries secret
+                          values. Multi-line values (e.g. PEM keys) are
+                          skipped — only single-line values are emitted.
+                          Existing FILE is truncated before write.
 
 Examples:
   op-exec op://Development/my-app-config -- npm start
