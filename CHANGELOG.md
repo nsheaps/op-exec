@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.0](https://github.com/nsheaps/op-exec/compare/v0.0.13...v0.1.0) (2026-05-20)
+
+### Features
+
+* add --concealed-kv-file flag (NAME=value, mode 600) ([#25](https://github.com/nsheaps/op-exec/issues/25)) ([42608b8](https://github.com/nsheaps/op-exec/commit/42608b8a315731d904892b569130642830497107))
+
 ## [0.0.13](https://github.com/nsheaps/op-exec/compare/v0.0.12...v0.0.13) (2026-05-19)
 
 ### Bug Fixes
