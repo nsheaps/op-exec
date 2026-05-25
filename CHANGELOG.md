@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1](https://github.com/nsheaps/op-exec/compare/v0.1.0...v0.1.1) (2026-05-25)
+
+### Maintenance
+
+* **deps:** update dependency release-it to ^20.0.1 ([#27](https://github.com/nsheaps/op-exec/issues/27)) ([d8faa10](https://github.com/nsheaps/op-exec/commit/d8faa10ce041d8215ddf0a2d12d930a022d89279))
+
 ## [0.1.0](https://github.com/nsheaps/op-exec/compare/v0.0.13...v0.1.0) (2026-05-20)
 
 ### Features
