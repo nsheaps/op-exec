@@ -336,6 +336,18 @@ main() {
   declare -A env_vars
   declare -A env_concealed
 
+  # Capture the field list first so a failed lookup (e.g. a missing item or a
+  # vault the service account can't see) aborts here with a clear message. If
+  # we streamed straight from `< <(fetch_fields ...)`, the failure would happen
+  # inside a process substitution where `set -e` can't see it, leaving us to
+  # crash later on an empty array instead of reporting the real cause.
+  local fields_json
+  if ! fields_json="$(fetch_fields "$vault" "$item")"; then
+    echo "Error: could not read item '$item' from vault '$vault'." >&2
+    echo "       See the 1Password CLI error above (item/vault may not exist or be accessible)." >&2
+    exit 1
+  fi
+
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     local label value type env_name
@@ -362,15 +374,22 @@ main() {
       env_concealed["$env_name"]=1
       debug "Marking $env_name as concealed"
     fi
-  done < <(fetch_fields "$vault" "$item")
+  done <<<"$fields_json"
 
   # Write concealed var names to --concealed-file if requested.
   # Written before exec so the file is populated even if the child process exits non-zero.
   if [[ -n "$CONCEALED_FILE" ]]; then
-    for name in "${!env_concealed[@]}"; do
-      printf '%s\n' "$name" >>"$CONCEALED_FILE"
-    done
-    debug "Wrote ${#env_concealed[@]} concealed var name(s) to $CONCEALED_FILE"
+    # Guard the iteration: an empty associative array errors under `set -u`
+    # when expanded with ${!arr[@]} / ${#arr[@]}. ${arr[*]+x} is non-empty
+    # only when the array has at least one element, and is itself safe.
+    if [[ -n "${env_concealed[*]+x}" ]]; then
+      for name in "${!env_concealed[@]}"; do
+        printf '%s\n' "$name" >>"$CONCEALED_FILE"
+      done
+      debug "Wrote ${#env_concealed[@]} concealed var name(s) to $CONCEALED_FILE"
+    else
+      debug "No concealed vars to write to $CONCEALED_FILE"
+    fi
   fi
 
   # Write NAME=value pairs to --concealed-kv-file if requested.
@@ -383,32 +402,38 @@ main() {
     : >"$CONCEALED_KV_FILE"
     chmod 0600 "$CONCEALED_KV_FILE"
     local kv_written=0 kv_skipped=0
-    for name in "${!env_concealed[@]}"; do
-      local val="${env_vars[$name]}"
-      if [[ "$val" == *$'\n'* ]]; then
-        debug "Skipping multi-line concealed value: $name"
-        kv_skipped=$((kv_skipped + 1))
-        continue
-      fi
-      printf '%s=%s\n' "$name" "$val" >>"$CONCEALED_KV_FILE"
-      kv_written=$((kv_written + 1))
-    done
+    if [[ -n "${env_concealed[*]+x}" ]]; then
+      for name in "${!env_concealed[@]}"; do
+        local val="${env_vars[$name]}"
+        if [[ "$val" == *$'\n'* ]]; then
+          debug "Skipping multi-line concealed value: $name"
+          kv_skipped=$((kv_skipped + 1))
+          continue
+        fi
+        printf '%s=%s\n' "$name" "$val" >>"$CONCEALED_KV_FILE"
+        kv_written=$((kv_written + 1))
+      done
+    fi
     debug "Wrote ${kv_written} NAME=value pair(s) (skipped ${kv_skipped} multi-line) to $CONCEALED_KV_FILE"
   fi
 
   # If no command provided, just print exports
   if [[ $# -eq 0 ]]; then
-    for name in "${!env_vars[@]}"; do
-      printf 'export %s=%q\n' "$name" "${env_vars[$name]}"
-    done
+    if [[ -n "${env_vars[*]+x}" ]]; then
+      for name in "${!env_vars[@]}"; do
+        printf 'export %s=%q\n' "$name" "${env_vars[$name]}"
+      done
+    fi
     exit 0
   fi
 
   # Otherwise, export and exec
-  for name in "${!env_vars[@]}"; do
-    export "$name"="${env_vars[$name]}"
-    debug "Exported: $name"
-  done
+  if [[ -n "${env_vars[*]+x}" ]]; then
+    for name in "${!env_vars[@]}"; do
+      export "$name"="${env_vars[$name]}"
+      debug "Exported: $name"
+    done
+  fi
 
   debug "Executing: $*"
   exec "$@"

@@ -34,6 +34,22 @@ runs:
       run: |
         set -euo pipefail
 
+        # Validate inputs up front so misconfiguration fails with a clear
+        # message instead of a cryptic op-exec parse error (e.g. an unset
+        # secret resolves to an empty string).
+        if [[ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]]; then
+          echo "::error::op-exec: 'op-token' input is empty. Set it to a 1Password service account token (e.g. secrets.OP_SERVICE_ACCOUNT_TOKEN)."
+          exit 1
+        fi
+        if [[ -z "${OP_EXEC_ENV_ITEM:-}" ]]; then
+          echo "::error::op-exec: 'env-item' input is empty. Set it to an op://vault/item reference. A blank value usually means the GitHub secret/variable it points at does not exist."
+          exit 1
+        fi
+        if [[ "$OP_EXEC_ENV_ITEM" != op://*/* ]]; then
+          echo "::error::op-exec: 'env-item' must be an op://vault/item reference."
+          exit 1
+        fi
+
         # Run op-exec straight from the checked-out action repo — no install.
         op_exec="${GITHUB_ACTION_PATH}/bin/op-exec"
         chmod +x "$op_exec" 2>/dev/null || true
