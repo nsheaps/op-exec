@@ -33,6 +33,36 @@ eval "$(op-exec op://vault/item)"
 brew install nsheaps/devsetup/op-exec
 ```
 
+## GitHub Action
+
+This repo also ships a composite action that loads a whole 1Password item into
+the environment of subsequent workflow steps. It runs `bin/op-exec` directly
+from the action checkout (no `brew`/`npm` install), masks every `CONCEALED`
+value with a workflow command, and forwards all resolved variables to
+`$GITHUB_ENV`.
+
+```yaml
+- name: Load secrets from 1Password
+  uses: nsheaps/op-exec@main # pin to a release tag once one is published
+  with:
+    op-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+    env-item: ${{ secrets.MY_ENV_ITEM }} # e.g. op://vault/my-app-env
+
+- name: Use the secrets
+  run: echo "DATABASE_URL is now in the environment"
+```
+
+| Input | Required | Description |
+| --- | --- | --- |
+| `op-token` | yes | 1Password service account token (exported as `OP_SERVICE_ACCOUNT_TOKEN`). |
+| `env-item` | yes | `op://vault/item` reference whose fields become environment variables. Values may themselves be `op://` references; they are resolved recursively. |
+
+Because `env-item` points at a **whole item**, you model your config as one
+1Password item whose fields are the variables you need (each field value can be
+a literal or an `op://` reference into another item). The action installs the
+1Password CLI via [`1password/install-cli-action`](https://github.com/1Password/install-cli-action)
+before running.
+
 ## Requirements
 
 - [1Password CLI](https://developer.1password.com/docs/cli) (`op`)

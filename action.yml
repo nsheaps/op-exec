@@ -1,0 +1,77 @@
+name: "op-exec: load 1Password item into env"
+description: >-
+  Resolve every field of a 1Password item into masked environment variables for
+  subsequent workflow steps. Runs the op-exec script directly from this repo
+  (no brew/npm install), masks CONCEALED values, and forwards everything to
+  $GITHUB_ENV.
+
+branding:
+  icon: "lock"
+  color: "blue"
+
+inputs:
+  op-token:
+    description: "1Password service account token (used as OP_SERVICE_ACCOUNT_TOKEN)."
+    required: true
+  env-item:
+    description: >-
+      1Password item reference (op://vault/item) whose STRING/CONCEALED fields
+      become environment variables. Field values may themselves be op://
+      references; op-exec resolves them recursively.
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install 1Password CLI
+      uses: 1password/install-cli-action@v3
+
+    - name: Resolve 1Password item into $GITHUB_ENV
+      shell: bash
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.op-token }}
+        OP_EXEC_ENV_ITEM: ${{ inputs.env-item }}
+      run: |
+        set -euo pipefail
+
+        # Run op-exec straight from the checked-out action repo — no install.
+        op_exec="${GITHUB_ACTION_PATH}/bin/op-exec"
+        chmod +x "$op_exec" 2>/dev/null || true
+
+        # op-exec appends the names of CONCEALED variables to --concealed-file
+        # so we know which values to mask.
+        concealed_file="$(mktemp)"
+        trap 'rm -f "$concealed_file"' EXIT
+
+        # With no command, op-exec prints shell-quoted `export NAME=value` lines
+        # (printf %q, one per line). Capture them without echoing to the log.
+        exports="$(bash "$op_exec" --concealed-file "$concealed_file" "$OP_EXEC_ENV_ITEM")"
+
+        # Bring the resolved values into this shell so we can mask + forward them.
+        eval "$exports"
+
+        # Mask every concealed value before it can reach the log or $GITHUB_ENV.
+        # Multi-line secrets (e.g. PEM keys) are masked line by line.
+        while IFS= read -r name; do
+          [[ -z "$name" ]] && continue
+          value="${!name-}"
+          [[ -z "$value" ]] && continue
+          while IFS= read -r line; do
+            if [[ -n "$line" ]]; then
+              echo "::add-mask::$line"
+            fi
+          done <<< "$value"
+        done < "$concealed_file"
+
+        # Forward every resolved variable to subsequent steps via $GITHUB_ENV.
+        # A randomized heredoc delimiter keeps multi-line values intact.
+        while IFS= read -r name; do
+          [[ -z "$name" ]] && continue
+          value="${!name-}"
+          delim="OP_EXEC_EOF_$(openssl rand -hex 16)"
+          {
+            printf '%s<<%s\n' "$name" "$delim"
+            printf '%s\n' "$value"
+            printf '%s\n' "$delim"
+          } >> "$GITHUB_ENV"
+        done < <(printf '%s\n' "$exports" | sed -n 's/^export \([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p')
