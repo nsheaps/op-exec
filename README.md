@@ -46,7 +46,7 @@ value with a workflow command, and forwards all resolved variables to
   uses: nsheaps/op-exec@main # pin to a release tag once one is published
   with:
     op-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-    env-item: ${{ secrets.MY_ENV_ITEM }} # e.g. op://heapsinfra/my-app-env
+    env-item: ${{ secrets.MY_ENV_ITEM }} # e.g. op://vault/my-app-env
 
 - name: Use the secrets
   run: echo "DATABASE_URL is now in the environment"
