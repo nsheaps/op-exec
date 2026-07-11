@@ -24,7 +24,7 @@ runs:
   using: "composite"
   steps:
     - name: Install 1Password CLI
-      uses: 1password/install-cli-action@v3
+      uses: 1password/install-cli-action@v4
 
     - name: Resolve 1Password item into $GITHUB_ENV
       shell: bash
