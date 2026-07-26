@@ -1414,7 +1414,7 @@ __metadata:
     conventional-changelog-conventionalcommits: "npm:^9.3.1"
     conventional-commits-filter: "npm:^5.0.0"
     conventional-commits-parser: "npm:^6.4.0"
-    release-it: "npm:^20.2.0"
+    release-it: "npm:^20.2.1"
   languageName: unknown
   linkType: soft
 
@@ -1616,7 +1616,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"release-it@npm:^20.2.0":
+"release-it@npm:^20.2.1":
   version: 20.2.1
   resolution: "release-it@npm:20.2.1"
   dependencies:
