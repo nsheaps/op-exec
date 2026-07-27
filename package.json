@@ -11,7 +11,7 @@
   "devDependencies": {
     "@release-it/conventional-changelog": "^11.0.1",
     "conventional-changelog-conventionalcommits": "^10.0.0",
-    "conventional-commits-filter": "^5.0.0",
+    "conventional-commits-filter": "^6.0.0",
     "conventional-commits-parser": "^6.4.0",
     "release-it": "^20.2.1"
   },
