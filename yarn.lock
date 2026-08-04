@@ -814,15 +814,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"conventional-commits-parser@npm:^7.0.0":
-  version: 7.1.0
-  resolution: "conventional-commits-parser@npm:7.1.0"
+"conventional-commits-parser@npm:^7.0.1":
+  version: 7.1.2
+  resolution: "conventional-commits-parser@npm:7.1.2"
   dependencies:
     "@simple-libs/stream-utils": "npm:^2.0.0"
     argue-cli: "npm:^3.1.0"
   bin:
     conventional-commits-parser: ./dist/cli/index.js
-  checksum: 10c0/7056dbe22c844561675dc08b9a3062da07d56e93fa4360fa1cb72dc5df5811b165cc5b2a317a6e05803cc3399ddcb641d701ed456443cffb36c407b2a17d1f97
+  checksum: 10c0/dd1478a5ef4fddd52cdd67fa4a97d1f47908a20d22287ccfa3f5e09b8298a3bcf3eb49ed117744805cc07ca31edf8835ce0913e96b1bcf7c385cf9bcefb3cf54
   languageName: node
   linkType: hard
 
@@ -1462,7 +1462,7 @@ __metadata:
     "@release-it/conventional-changelog": "npm:^11.0.1"
     conventional-changelog-conventionalcommits: "npm:^10.2.1"
     conventional-commits-filter: "npm:^6.0.0"
-    conventional-commits-parser: "npm:^7.0.0"
+    conventional-commits-parser: "npm:^7.0.1"
     release-it: "npm:^20.2.1"
   languageName: unknown
   linkType: soft
