@@ -784,7 +784,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"conventional-commits-filter@npm:^6.0.0":
+"conventional-commits-filter@npm:^6.0.1":
   version: 6.0.1
   resolution: "conventional-commits-filter@npm:6.0.1"
   checksum: 10c0/afd7bd4dea9d5337e2f69ef868d77f7ff9293c5fa951513d5be483fd347a8810d982c6a93ac6f7a8785a8e38ef451dfc52fd311e9956a624820461daec6d6f5a
@@ -1461,7 +1461,7 @@ __metadata:
   dependencies:
     "@release-it/conventional-changelog": "npm:^11.0.1"
     conventional-changelog-conventionalcommits: "npm:^10.2.1"
-    conventional-commits-filter: "npm:^6.0.0"
+    conventional-commits-filter: "npm:^6.0.1"
     conventional-commits-parser: "npm:^7.0.1"
     release-it: "npm:^20.2.1"
   languageName: unknown
