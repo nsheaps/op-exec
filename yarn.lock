@@ -718,7 +718,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"conventional-changelog-conventionalcommits@npm:^10.2.0":
+"conventional-changelog-conventionalcommits@npm:^10.2.1":
   version: 10.2.1
   resolution: "conventional-changelog-conventionalcommits@npm:10.2.1"
   dependencies:
@@ -1460,7 +1460,7 @@ __metadata:
   resolution: "op-exec@workspace:."
   dependencies:
     "@release-it/conventional-changelog": "npm:^11.0.1"
-    conventional-changelog-conventionalcommits: "npm:^10.2.0"
+    conventional-changelog-conventionalcommits: "npm:^10.2.1"
     conventional-commits-filter: "npm:^6.0.0"
     conventional-commits-parser: "npm:^7.0.0"
     release-it: "npm:^20.2.1"
