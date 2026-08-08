@@ -814,7 +814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"conventional-commits-parser@npm:^7.0.1":
+"conventional-commits-parser@npm:^7.1.0":
   version: 7.1.2
   resolution: "conventional-commits-parser@npm:7.1.2"
   dependencies:
@@ -1462,7 +1462,7 @@ __metadata:
     "@release-it/conventional-changelog": "npm:^11.0.1"
     conventional-changelog-conventionalcommits: "npm:^10.2.1"
     conventional-commits-filter: "npm:^6.0.1"
-    conventional-commits-parser: "npm:^7.0.1"
+    conventional-commits-parser: "npm:^7.1.0"
     release-it: "npm:^20.2.1"
   languageName: unknown
   linkType: soft
