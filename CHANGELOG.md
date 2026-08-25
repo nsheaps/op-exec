@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.35](https://github.com/nsheaps/op-exec/compare/v0.1.34...v0.1.35) (2026-08-25)
+
+### Maintenance
+
+* **deps:** update dependency @release-it/conventional-changelog to v12 ([#53](https://github.com/nsheaps/op-exec/issues/53)) ([95de874](https://github.com/nsheaps/op-exec/commit/95de874e95762c5fc8f6d2f31b982589cc52a69d)), references [#8203](https://github.com/nsheaps/op-exec/issues/8203)
+
 ## [0.1.34](https://github.com/nsheaps/op-exec/compare/v0.1.33...v0.1.34) (2026-08-25)
 
 ## [0.1.33](https://github.com/nsheaps/op-exec/compare/v0.1.32...v0.1.33) (2026-08-20)
