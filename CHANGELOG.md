@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.1.34](https://github.com/nsheaps/op-exec/compare/v0.1.33...v0.1.34) (2026-08-25)
+
 ## [0.1.33](https://github.com/nsheaps/op-exec/compare/v0.1.32...v0.1.33) (2026-08-20)
 
 ## [0.1.32](https://github.com/nsheaps/op-exec/compare/v0.1.31...v0.1.32) (2026-08-17)
