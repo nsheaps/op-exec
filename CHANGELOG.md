@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.36](https://github.com/nsheaps/op-exec/compare/v0.1.35...v0.1.36) (2026-08-26)
+
+### Maintenance
+
+* **deps:** update dependency release-it to v21 ([#54](https://github.com/nsheaps/op-exec/issues/54)) ([03c9b91](https://github.com/nsheaps/op-exec/commit/03c9b9129b00a19261d8004a2ef8b11cf9d74aec))
+
 ## [0.1.35](https://github.com/nsheaps/op-exec/compare/v0.1.34...v0.1.35) (2026-08-25)
 
 ### Maintenance
