@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.38](https://github.com/nsheaps/op-exec/compare/v0.1.37...v0.1.38) (2026-08-28)
+
+### Maintenance
+
+* **deps:** update yarn to v4.18.0 ([#56](https://github.com/nsheaps/op-exec/issues/56)) ([d3bc8be](https://github.com/nsheaps/op-exec/commit/d3bc8be16e059666e0c9b8e7bf9e9bed1a7c3332))
+
 ## [0.1.37](https://github.com/nsheaps/op-exec/compare/v0.1.36...v0.1.37) (2026-08-27)
 
 ### Maintenance
