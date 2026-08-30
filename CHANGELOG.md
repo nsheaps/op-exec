@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.39](https://github.com/nsheaps/op-exec/compare/v0.1.38...v0.1.39) (2026-08-30)
+
+### Maintenance
+
+* **deps:** update all patch updates ([#57](https://github.com/nsheaps/op-exec/issues/57)) ([94ee470](https://github.com/nsheaps/op-exec/commit/94ee470fec53fbf9e23a7d001e4f68d629ff024c))
+
 ## [0.1.38](https://github.com/nsheaps/op-exec/compare/v0.1.37...v0.1.38) (2026-08-28)
 
 ### Maintenance
