@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.42](https://github.com/nsheaps/op-exec/compare/v0.1.41...v0.1.42) (2026-09-08)
+
+### Maintenance
+
+* **deps:** update dependency release-it to ^21.0.2 ([#60](https://github.com/nsheaps/op-exec/issues/60)) ([0e2c390](https://github.com/nsheaps/op-exec/commit/0e2c390f51008b9072a43d76ce6caadda863dcd6))
+* **deps:** update nsheaps/agents digest to d77f2ee ([47d0b36](https://github.com/nsheaps/op-exec/commit/47d0b36fbe6a2a8513b969a47550d284d7f7287d))
+
 ## [0.1.41](https://github.com/nsheaps/op-exec/compare/v0.1.40...v0.1.41) (2026-09-04)
 
 ### Maintenance
