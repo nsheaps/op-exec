@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.49](https://github.com/nsheaps/op-exec/compare/v0.1.48...v0.1.49) (2026-10-01)
+
+### Maintenance
+
+* **deps:** update nsheaps/agents digest to dea197d ([7310b85](https://github.com/nsheaps/op-exec/commit/7310b85626c6285986fff75b67964c2a70bec6ad))
+
 ## [0.1.48](https://github.com/nsheaps/op-exec/compare/v0.1.47...v0.1.48) (2026-09-29)
 
 ### Maintenance
