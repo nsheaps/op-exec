@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.51](https://github.com/nsheaps/op-exec/compare/v0.1.50...v0.1.51) (2026-10-09)
+
+### Maintenance
+
+* **deps:** update nsheaps/agents digest to 49e4ab5 ([5b35450](https://github.com/nsheaps/op-exec/commit/5b35450b2578f319c7c1b8478c8bfddbfd7d4018))
+
 ## [0.1.50](https://github.com/nsheaps/op-exec/compare/v0.1.49...v0.1.50) (2026-10-07)
 
 ### Maintenance
