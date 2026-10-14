@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.53](https://github.com/nsheaps/op-exec/compare/v0.1.52...v0.1.53) (2026-10-14)
+
+### Maintenance
+
+* **deps:** update all patch updates ([#63](https://github.com/nsheaps/op-exec/issues/63)) ([a6a995e](https://github.com/nsheaps/op-exec/commit/a6a995e3a873732bb2fe16ae3cc4321d6de9f67a)), references [#8203](https://github.com/nsheaps/op-exec/issues/8203)
+
 ## [0.1.52](https://github.com/nsheaps/op-exec/compare/v0.1.51...v0.1.52) (2026-10-13)
 
 ### Maintenance
