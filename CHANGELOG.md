@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.56](https://github.com/nsheaps/op-exec/compare/v0.1.55...v0.1.56) (2026-10-21)
+
+### Maintenance
+
+* **deps:** update nsheaps/agents digest to b770c57 ([253f3c0](https://github.com/nsheaps/op-exec/commit/253f3c08da6db1300de842d717d79c131837b9bc))
+
 ## [0.1.55](https://github.com/nsheaps/op-exec/compare/v0.1.54...v0.1.55) (2026-10-18)
 
 ### Maintenance
