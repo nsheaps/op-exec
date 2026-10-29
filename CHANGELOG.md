@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.59](https://github.com/nsheaps/op-exec/compare/v0.1.58...v0.1.59) (2026-10-29)
+
+### Maintenance
+
+* **deps:** update jdx/mise-action action to v5 ([#66](https://github.com/nsheaps/op-exec/issues/66)) ([5d608c1](https://github.com/nsheaps/op-exec/commit/5d608c1bd8418b846fcd3db36d2283a5b0b33cc4))
+
 ## [0.1.58](https://github.com/nsheaps/op-exec/compare/v0.1.57...v0.1.58) (2026-10-25)
 
 ### Maintenance
