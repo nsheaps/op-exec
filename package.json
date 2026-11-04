@@ -10,9 +10,9 @@
   "license": "MIT",
   "devDependencies": {
     "@release-it/conventional-changelog": "^12.0.2",
-    "conventional-changelog-conventionalcommits": "^10.4.0",
+    "conventional-changelog-conventionalcommits": "^10.4.1",
     "conventional-commits-filter": "^6.0.1",
-    "conventional-commits-parser": "^7.1.2",
+    "conventional-commits-parser": "^7.1.3",
     "release-it": "^21.1.0"
   },
   "packageManager": "yarn@4.18.1+sha512.107f80e13c40b41597284d03190c56f41a3d72b5c72c9ef799fc634d026ebfc5e89cd5964e97a2f014392637331c9354f4644e4f27303059fc88ebd12195d470"
